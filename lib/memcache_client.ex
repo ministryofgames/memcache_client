@@ -197,7 +197,7 @@ defmodule Memcache.Client do
                   {:error, _error} ->
                     response = %{response | status: :transcode_error,
                                  value: "Transcode error"}
-                  value ->
+                  {:ok, value} ->
                     response = %{response | value: value, data_type: type_flag}
                 end
               end
@@ -249,7 +249,7 @@ defmodule Memcache.Client do
     expires = Keyword.get(opts, :expires, 0)
     cas     = Keyword.get(opts, :cas, 0)
 
-    {value, flags} = Memcache.Client.Transcoder.encode_value(value)
+    {:ok, value, flags} = Memcache.Client.Transcoder.encode_value(value)
     extras = <<flags :: size(32), expires :: size(32)>>
 
     %Request{opcode: opcode, key: key, value: value, extras: extras, cas: cas}
