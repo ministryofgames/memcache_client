@@ -102,12 +102,6 @@ defmodule Memcache.Client do
   @spec replace(key, value, opts) :: Response.t
   def replace(key, value, opts \\ []), do: do_store(:replace, key, value, opts)
 
-  def delete(key) do
-    request = %Request{opcode: :delete, key: key}
-    [response] = multi_request([request], false)
-    response
-  end
-
   @doc """
   Appends `value` to given `key` if it already exists.
   """
