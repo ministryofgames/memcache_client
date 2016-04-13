@@ -21,7 +21,7 @@ defmodule Memcache.Client.Mixfile do
     [
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.10", only: :dev},
-      {:poison, "~> 2.1"},
+      {:poison, "~> 1.5"},
       {:poolboy, "~> 1.5.1"}
     ]
   end
