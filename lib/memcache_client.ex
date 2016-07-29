@@ -191,17 +191,19 @@ defmodule Memcache.Client do
                                    key: key, value: value, extras: extras}
 
               # apply transcoder for get operations
-              if extras != "" and Opcode.get?(header.opcode) do
-                <<type_flag :: size(32)>> = extras
-                case Memcache.Client.Transcoder.decode_value(response.value, type_flag) do
-                  {:error, _error} ->
-                    response = %{response | status: :transcode_error,
-                                 value: "Transcode error"}
-                  {:ok, value} ->
-                    response = %{response | value: value, data_type: type_flag}
+              response =
+                if extras != "" and Opcode.get?(header.opcode) do
+                  <<type_flag :: size(32)>> = extras
+                  case Memcache.Client.Transcoder.decode_value(response.value, type_flag) do
+                    {:error, _error} ->
+                      %{response | status: :transcode_error, value: "Transcode error"}
+                    {:ok, value} ->
+                      %{response | value: value, data_type: type_flag}
+                  end
+                else
+                  response
                 end
-              end
-              
+
               if not Opcode.quiet?(header.opcode) do
                 # we'll halt since there won't be anymore results
                 {[response], {worker, :halt}}
@@ -215,7 +217,7 @@ defmodule Memcache.Client do
       fn {worker, _} ->
         :poolboy.checkin(Memcache.Client.Pool, worker)
       end)
-    
+
     if return_stream do
       stream
     else
